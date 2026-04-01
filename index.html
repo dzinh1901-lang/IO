@@ -1,102 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Three.js Galaxy Viewer</title>
-  <style>
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-    }
-
-    canvas {
-      display: block;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IO - 3D Galaxy Visualization</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <script type="module">
-    import * as THREE from 'https://unpkg.com/three@0.164.1/build/three.module.js';
-    import { OrbitControls } from 'https://unpkg.com/three@0.164.1/examples/jsm/controls/OrbitControls.js';
+    <div id="ui-container">
+        <h1>IO Explorer</h1>
+        <p>Macro view of the Milky Way</p>
+    </div>
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    <canvas id="gl-canvas"></canvas>
 
-    const camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      2000
-    );
-    camera.position.set(0, 0, 10);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    document.body.appendChild(renderer.domElement);
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    directionalLight.position.set(5, 10, 7.5);
-    scene.add(directionalLight);
-
-    const textureLoader = new THREE.TextureLoader();
-    const milkyWayTexture = textureLoader.load('https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg');
-    milkyWayTexture.colorSpace = THREE.SRGBColorSpace;
-
-    const galaxyRadius = 900;
-    const starfieldGeometry = new THREE.SphereGeometry(galaxyRadius, 96, 96);
-    const starfieldMaterial = new THREE.MeshBasicMaterial({
-      map: milkyWayTexture,
-      side: THREE.BackSide
-    });
-    const starfield = new THREE.Mesh(starfieldGeometry, starfieldMaterial);
-    scene.add(starfield);
-
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x4ea1ff,
-      metalness: 0.2,
-      roughness: 0.6
-    });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.enablePan = false;
-    controls.minDistance = 2;
-    controls.maxDistance = galaxyRadius - 25;
-    controls.target.set(0, 0, 0);
-    controls.update();
-
-    function onResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    }
-
-    window.addEventListener('resize', onResize);
-
-    function animate() {
-      requestAnimationFrame(animate);
-
-      cube.rotation.x += 0.002;
-      cube.rotation.y += 0.003;
-
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    animate();
-  </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    
+    <script type="module" src="main.js"></script>
 </body>
 </html>
