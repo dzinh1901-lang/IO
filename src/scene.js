@@ -17,7 +17,7 @@ export function createSceneApp(appRoot) {
   scene.background = new THREE.Color(0x000000);
 
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2500);
-  camera.position.set(0, 2, 14);
+  camera.position.set(0, 10, 42);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -29,20 +29,29 @@ export function createSceneApp(appRoot) {
   composer.setSize(window.innerWidth, window.innerHeight);
   composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.9, 0.8, 0.2));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.1, 0.85, 0.15));
 
-  const ambientLight = new THREE.AmbientLight(0x89aaff, 0.45);
+  const ambientLight = new THREE.AmbientLight(0x89aaff, 0.35);
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.7);
-  directionalLight.position.set(12, 8, 6);
+  const sunLight = new THREE.PointLight(0xffddaa, 3.8, 500, 2);
+  sunLight.position.set(0, 0, 0);
+  scene.add(sunLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+  directionalLight.position.set(40, 25, 10);
   scene.add(directionalLight);
 
-  const rimLight = new THREE.DirectionalLight(0x4d79ff, 1.2);
-  rimLight.position.set(-10, -4, -12);
+  const rimLight = new THREE.DirectionalLight(0x4d79ff, 0.7);
+  rimLight.position.set(-20, -10, -30);
   scene.add(rimLight);
 
   const controls = createControls(camera, renderer.domElement);
+  controls.minDistance = 16;
+  controls.maxDistance = 140;
+  controls.target.set(0, 0, 0);
+  controls.update();
+
   const { updatePlanet } = createPlanetSystem(scene, loading);
   const { updateStars } = createStars(scene);
 
@@ -53,15 +62,14 @@ export function createSceneApp(appRoot) {
   function animate() {
     requestAnimationFrame(animate);
 
+    const delta = clock.getDelta() * 60;
     const elapsed = clock.getElapsedTime();
-    const driftX = Math.sin(elapsed * 0.12) * 0.18;
-    const driftY = Math.cos(elapsed * 0.08) * 0.12;
 
-    updatePlanet(elapsed);
-    updateStars();
+    updatePlanet(delta);
+    updateStars(delta);
 
-    controls.target.x = driftX;
-    controls.target.y = driftY;
+    controls.target.x = Math.sin(elapsed * 0.04) * 1.2;
+    controls.target.y = Math.cos(elapsed * 0.03) * 0.6;
     controls.update();
     composer.render();
   }
