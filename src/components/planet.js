@@ -42,7 +42,12 @@ export function createPlanetSystem(scene, loadingOverlay) {
     })
   ];
 
+  const selectableMeshes = [];
+
   bodies.forEach((body) => {
+    body.mesh.userData.celestialBody = body;
+    body.mesh.userData.selectable = true;
+    selectableMeshes.push(body.mesh);
     planetGroup.add(body.orbitGroup);
   });
 
@@ -76,6 +81,7 @@ export function createPlanetSystem(scene, loadingOverlay) {
     planetGroup,
     bodies,
     belt,
+    selectableMeshes,
     updatePlanet
   };
 }
