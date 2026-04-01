@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Tween, Easing, update as updateTween } from '@tweenjs/tween.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -47,29 +48,128 @@ export function createSceneApp(appRoot) {
   scene.add(rimLight);
 
   const controls = createControls(camera, renderer.domElement);
-  controls.minDistance = 16;
+  controls.minDistance = 4;
   controls.maxDistance = 140;
   controls.target.set(0, 0, 0);
   controls.update();
 
-  const { updatePlanet } = createPlanetSystem(scene, loading);
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  let isFlying = false;
+
+  const { updatePlanet, selectableMeshes } = createPlanetSystem(scene, loading);
   const { updateStars } = createStars(scene);
+
+  function flyToBody(body) {
+    if (!body || isFlying) {
+      return;
+    }
+
+    const targetPosition = new THREE.Vector3();
+    body.mesh.getWorldPosition(targetPosition);
+
+    const radius = body.size;
+    const distance = Math.max(radius * 4.5, radius + 2.5);
+    const currentDirection = new THREE.Vector3()
+      .subVectors(camera.position, controls.target)
+      .normalize();
+
+    if (currentDirection.lengthSq() === 0) {
+      currentDirection.set(0.4, 0.25, 1).normalize();
+    }
+
+    const nextCameraPosition = targetPosition.clone().add(currentDirection.multiplyScalar(distance));
+
+    const cameraTweenState = {
+      x: camera.position.x,
+      y: camera.position.y,
+      z: camera.position.z
+    };
+
+    const targetTweenState = {
+      x: controls.target.x,
+      y: controls.target.y,
+      z: controls.target.z
+    };
+
+    isFlying = true;
+    controls.enabled = false;
+
+    new Tween(cameraTweenState)
+      .to(
+        {
+          x: nextCameraPosition.x,
+          y: nextCameraPosition.y,
+          z: nextCameraPosition.z
+        },
+        1800
+      )
+      .easing(Easing.Cubic.InOut)
+      .onUpdate(() => {
+        camera.position.set(cameraTweenState.x, cameraTweenState.y, cameraTweenState.z);
+      })
+      .start();
+
+    new Tween(targetTweenState)
+      .to(
+        {
+          x: targetPosition.x,
+          y: targetPosition.y,
+          z: targetPosition.z
+        },
+        1800
+      )
+      .easing(Easing.Cubic.InOut)
+      .onUpdate(() => {
+        controls.target.set(targetTweenState.x, targetTweenState.y, targetTweenState.z);
+        controls.update();
+      })
+      .onComplete(() => {
+        controls.enabled = true;
+        isFlying = false;
+      })
+      .start();
+  }
+
+  function handlePointerDown(event) {
+    if (isFlying) {
+      return;
+    }
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(pointer, camera);
+    const intersections = raycaster.intersectObjects(selectableMeshes, false);
+
+    if (intersections.length > 0) {
+      const selectedMesh = intersections[0].object;
+      flyToBody(selectedMesh.userData.celestialBody);
+    }
+  }
+
+  renderer.domElement.addEventListener('pointerdown', handlePointerDown);
 
   bindResize({ camera, renderer, composer });
 
   const clock = new THREE.Clock();
 
-  function animate() {
+  function animate(time) {
     requestAnimationFrame(animate);
 
     const delta = clock.getDelta() * 60;
     const elapsed = clock.getElapsedTime();
 
+    updateTween(time);
     updatePlanet(delta);
     updateStars(delta);
 
-    controls.target.x = Math.sin(elapsed * 0.04) * 1.2;
-    controls.target.y = Math.cos(elapsed * 0.03) * 0.6;
+    if (!isFlying) {
+      controls.target.x = Math.sin(elapsed * 0.04) * 1.2;
+      controls.target.y = Math.cos(elapsed * 0.03) * 0.6;
+    }
+
     controls.update();
     composer.render();
   }
