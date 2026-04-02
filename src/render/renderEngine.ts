@@ -37,6 +37,7 @@ export class RenderEngine {
     minVisualRadiusPx: 5,
     strictTrueScale: false,
   };
+  private readonly targetWorld = new THREE.Vector3();
 
   public constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -77,12 +78,12 @@ export class RenderEngine {
     this.camera.far = scale.cameraFar;
     this.camera.updateProjectionMatrix();
 
-    const targetWorld = new THREE.Vector3(
+    this.targetWorld.set(
       (cameraView.targetTruthKm[0] - scale.originKm[0]) / scale.kmPerUnit,
       (cameraView.targetTruthKm[1] - scale.originKm[1]) / scale.kmPerUnit,
       (cameraView.targetTruthKm[2] - scale.originKm[2]) / scale.kmPerUnit
     );
-    this.camera.lookAt(targetWorld);
+    this.camera.lookAt(this.targetWorld);
 
     const context: RenderContext = {
       scale,
@@ -101,7 +102,9 @@ export class RenderEngine {
     this.renderer.render(this.scene, this.camera);
 
     const focusBody = cameraView.focusBodyId ? this.truthStore.getBody(cameraView.focusBodyId) : undefined;
-    const scaledBodies = this.bodyRenderer.getScaledBodies();
+    const scaledBodies = this.bodyRenderer
+      .getScaledBodies()
+      .map((bodyId) => this.truthStore.getBody(bodyId)?.name ?? bodyId);
     return {
       focusName: focusBody?.name ?? 'Free camera',
       focusBodyId: cameraView.focusBodyId,

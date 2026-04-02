@@ -51,14 +51,33 @@ export class BodyRenderer {
         entry.ring.scale.setScalar(Math.max(outerUnits, 1e-6));
       }
 
-      this.states.set(body.id, {
-        bodyId: body.id,
-        lod: visualRadiusUnits < 0.05 ? 'point' : visualRadiusUnits < 0.4 ? 'sphere_low' : 'sphere_high',
-        worldPos: entry.body.position.clone(),
-        isScaled: visualRadiusUnits > physicalRadiusUnits * 1.001,
-        visualRadiusUnits,
-        physicalRadiusUnits,
-      });
+      const existingState = this.states.get(body.id);
+      if (existingState) {
+        existingState.lod =
+          visualRadiusUnits < 0.05
+            ? 'point'
+            : visualRadiusUnits < 0.4
+              ? 'sphere_low'
+              : 'sphere_high';
+        existingState.worldPos.copy(entry.body.position);
+        existingState.isScaled = visualRadiusUnits > physicalRadiusUnits * 1.001;
+        existingState.visualRadiusUnits = visualRadiusUnits;
+        existingState.physicalRadiusUnits = physicalRadiusUnits;
+      } else {
+        this.states.set(body.id, {
+          bodyId: body.id,
+          lod:
+            visualRadiusUnits < 0.05
+              ? 'point'
+              : visualRadiusUnits < 0.4
+                ? 'sphere_low'
+                : 'sphere_high',
+          worldPos: entry.body.position.clone(),
+          isScaled: visualRadiusUnits > physicalRadiusUnits * 1.001,
+          visualRadiusUnits,
+          physicalRadiusUnits,
+        });
+      }
     }
   }
 
@@ -73,6 +92,9 @@ export class BodyRenderer {
   }
 
   private createMeshes(body: BodyDefinition): void {
+    if (body.class === 'barycenter') {
+      return;
+    }
     const material = body.visuals.emissive
       ? new THREE.MeshBasicMaterial({ color: body.visuals.baseColour })
       : new THREE.MeshStandardMaterial({

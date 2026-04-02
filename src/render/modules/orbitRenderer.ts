@@ -24,6 +24,10 @@ export class OrbitRenderer {
       let line = this.lines.get(body.id);
       if (!line) {
         const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute(
+          'position',
+          new THREE.BufferAttribute(new Float32Array(samples.length * 3), 3)
+        );
         const material = new THREE.LineBasicMaterial({
           color: body.visuals.baseColour,
           transparent: true,
@@ -33,14 +37,17 @@ export class OrbitRenderer {
         this.lines.set(body.id, line);
         this.group.add(line);
       }
-      const positions = new Float32Array(samples.length * 3);
+      const positionAttribute = line.geometry.getAttribute(
+        'position'
+      ) as THREE.BufferAttribute;
+      const positions = positionAttribute.array as Float32Array;
       for (let i = 0; i < samples.length; i += 1) {
         const [x, y, z] = this.floatingOrigin.toWorldPosition(samples[i].state.posKm, context.scale);
         positions[i * 3] = x;
         positions[i * 3 + 1] = y;
         positions[i * 3 + 2] = z;
       }
-      line.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      positionAttribute.needsUpdate = true;
       line.geometry.computeBoundingSphere();
     }
   }
