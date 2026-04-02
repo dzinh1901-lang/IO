@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IO Explorer — 3D Galaxy Visualization</title>
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+
+  <!-- ── NAV ────────────────────────────────────────────────── -->
+  <nav class="nav" id="nav">
+    <span class="nav-logo">IO</span>
+    <a class="nav-cta" href="index.html">Launch Explorer</a>
+  </nav>
+
+  <!-- ── HERO ───────────────────────────────────────────────── -->
+  <section class="hero" id="hero">
+    <canvas id="star-canvas"></canvas>
+
+    <div class="hero-content" data-reveal>
+      <p class="label">WebGL · Three.js · Real-time</p>
+      <h1 class="hero-headline">
+        Real-time 3D Galaxy<br />in Your Browser
+      </h1>
+      <p class="hero-sub">
+        A WebGL rendering engine that brings the Milky Way and solar
+        system orbital mechanics to a single browser tab — no install,
+        no plugin.
+      </p>
+      <a class="btn-primary" href="index.html">Launch Explorer</a>
+    </div>
+
+    <div class="hero-orb orb-1"></div>
+    <div class="hero-orb orb-2"></div>
+    <div class="scroll-hint" aria-hidden="true">↓</div>
+  </section>
+
+  <!-- ── DATA JSON (extracted) ──────────────────────────────── -->
+  <!--
+  {
+    "product_name": "IO Explorer",
+    "category": "3D Space Visualization",
+    "function": "Real-time 3D galaxy and planetary system rendering in the browser via WebGL",
+    "user": "Developers, students, and space enthusiasts exploring celestial mechanics",
+    "problem": "Immersive space exploration requires specialized desktop software; IO brings it to any browser tab",
+    "features": [
+      { "id": "galaxy",    "title": "Milky Way Macro View",        "desc": "Full galaxy rendered via instanced geometry and particle fields." },
+      { "id": "planets",   "title": "Solar System Simulation",     "desc": "Sun, Earth, Jupiter, Saturn with accurate orbital radii and rotation speeds." },
+      { "id": "belt",      "title": "Asteroid Belt",               "desc": "5,000 procedurally-placed bodies between Mars and Jupiter orbits." },
+      { "id": "orbital",   "title": "Orbital Mechanics",           "desc": "Each body follows its orbital radius with configurable angular velocity." },
+      { "id": "texture",   "title": "Texture-mapped Bodies",       "desc": "High-resolution texture maps applied to every celestial body in the scene." },
+      { "id": "webgl",     "title": "Real-time WebGL Renderer",    "desc": "Three.js scene loop delivers frame-rate rendering via the browser GPU pipeline." }
+    ],
+    "mechanism": "Three.js WebGL engine renders a scene graph of CelestialBody instances. Each body carries texture, emissive glow, orbital radius, and rotation speed parameters. An animation loop calls updatePlanet(delta) per frame, advancing orbital positions and applying rotation. The asteroid belt uses instanced mesh for GPU-efficient rendering of 5,000 bodies.",
+    "flow": [
+      "Open IO Explorer in any WebGL-capable browser",
+      "Galaxy macro view initialises — Milky Way starfield renders",
+      "Planetary system loads — Sun, Earth, Jupiter, Saturn animate into orbit",
+      "Navigate and inspect individual celestial bodies"
+    ],
+    "terminology": ["celestial body","orbital radius","rotation speed","emissive","asteroid belt","WebGL","Three.js","glow","orbital mechanics","texture mapping","instanced mesh","scene graph","CelestialBody","delta"]
+  }
+  -->
+
+  <!-- ── FEATURES ───────────────────────────────────────────── -->
+  <section class="section features-section" id="features">
+    <div class="section-inner">
+      <p class="label" data-reveal>Features</p>
+      <h2 class="section-title" data-reveal>What IO Renders</h2>
+
+      <div class="feature-grid">
+
+        <div class="feature-card" data-reveal data-delay="0">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>
+              <line x1="12" y1="3" x2="12" y2="1"/><line x1="12" y1="23" x2="12" y2="21"/>
+              <line x1="3" y1="12" x2="1" y2="12"/><line x1="23" y1="12" x2="21" y2="12"/>
+            </svg>
+          </div>
+          <h3>Milky Way Macro View</h3>
+          <p>Full galaxy rendered via instanced geometry and particle fields.</p>
+        </div>
+
+        <div class="feature-card" data-reveal data-delay="80">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <circle cx="12" cy="12" r="4"/>
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"/>
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/>
+            </svg>
+          </div>
+          <h3>Solar System Simulation</h3>
+          <p>Sun, Earth, Jupiter, Saturn with accurate orbital radii and rotation speeds.</p>
+        </div>
+
+        <div class="feature-card" data-reveal data-delay="160">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <circle cx="5" cy="12" r="1.5"/><circle cx="9" cy="9" r="1"/><circle cx="14" cy="14" r="1"/>
+              <circle cx="18" cy="10" r="1.5"/><circle cx="11" cy="17" r="1"/>
+              <circle cx="7" cy="5" r="0.8"/><circle cx="17" cy="17" r="0.8"/>
+            </svg>
+          </div>
+          <h3>Asteroid Belt</h3>
+          <p>5,000 procedurally-placed bodies between Mars and Jupiter orbits.</p>
+        </div>
+
+        <div class="feature-card" data-reveal data-delay="0">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <path d="M12 2 A10 10 0 1 1 2 12"/><polyline points="2,6 2,12 8,12"/>
+            </svg>
+          </div>
+          <h3>Orbital Mechanics</h3>
+          <p>Each body follows its orbital radius with configurable angular velocity.</p>
+        </div>
+
+        <div class="feature-card" data-reveal data-delay="80">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="3" y="3" width="18" height="14" rx="2"/>
+              <circle cx="12" cy="10" r="3"/><line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <h3>Texture-mapped Bodies</h3>
+          <p>High-resolution texture maps applied to every celestial body in the scene.</p>
+        </div>
+
+        <div class="feature-card" data-reveal data-delay="160">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
+            </svg>
+          </div>
+          <h3>Real-time WebGL Renderer</h3>
+          <p>Three.js scene loop delivers frame-rate rendering via the browser GPU pipeline.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MECHANISM ──────────────────────────────────────────── -->
+  <section class="section mechanism-section" id="mechanism">
+    <div class="section-inner">
+      <p class="label" data-reveal>Mechanism</p>
+      <h2 class="section-title" data-reveal>How the Renderer Works</h2>
+
+      <div class="mechanism-layout">
+        <div class="mechanism-visual" data-reveal>
+          <div class="mech-ring mech-ring-1"></div>
+          <div class="mech-ring mech-ring-2"></div>
+          <div class="mech-ring mech-ring-3"></div>
+          <div class="mech-core"></div>
+          <div class="mech-body mech-body-1"></div>
+          <div class="mech-body mech-body-2"></div>
+          <div class="mech-body mech-body-3"></div>
+        </div>
+
+        <div class="mechanism-text" data-reveal data-delay="120">
+          <div class="mech-block">
+            <span class="mech-tag">Scene Graph</span>
+            <p>A <code>THREE.Group</code> holds all <code>CelestialBody</code> instances. Each body owns an <code>orbitGroup</code> that positions it relative to the parent star.</p>
+          </div>
+          <div class="mech-block">
+            <span class="mech-tag">Animation Loop</span>
+            <p><code>updatePlanet(delta)</code> is called each frame. It advances every body's orbital angle and applies per-body rotation speed, producing continuous motion.</p>
+          </div>
+          <div class="mech-block">
+            <span class="mech-tag">Instanced Mesh</span>
+            <p>The 5,000-body asteroid belt uses <code>THREE.InstancedMesh</code> for a single GPU draw call — keeping frame-rate stable regardless of body count.</p>
+          </div>
+          <div class="mech-block">
+            <span class="mech-tag">Emissive Glow</span>
+            <p>The Sun uses an emissive <code>MeshBasicMaterial</code> overlaid with a semi-transparent <code>SphereGeometry</code> at 4.7 units radius to simulate corona glow.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FLOW ───────────────────────────────────────────────── -->
+  <section class="section flow-section" id="flow">
+    <div class="section-inner">
+      <p class="label" data-reveal>Flow</p>
+      <h2 class="section-title" data-reveal>From Load to Exploration</h2>
+
+      <div class="flow-steps">
+
+        <div class="flow-step" data-reveal data-delay="0">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3>Open in Browser</h3>
+            <p>Open IO Explorer in any WebGL-capable browser — no plugin, no install.</p>
+          </div>
+          <div class="step-connector"></div>
+        </div>
+
+        <div class="flow-step" data-reveal data-delay="100">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3>Galaxy Initialises</h3>
+            <p>The Milky Way starfield renders. Galaxy macro view becomes the initial camera position.</p>
+          </div>
+          <div class="step-connector"></div>
+        </div>
+
+        <div class="flow-step" data-reveal data-delay="200">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3>Planetary System Loads</h3>
+            <p>Sun, Earth, Jupiter, and Saturn animate into their orbital positions with correct radii.</p>
+          </div>
+          <div class="step-connector"></div>
+        </div>
+
+        <div class="flow-step" data-reveal data-delay="300">
+          <div class="step-number">04</div>
+          <div class="step-content">
+            <h3>Navigate &amp; Inspect</h3>
+            <p>Navigate the scene and inspect individual celestial bodies — orbit, rotation, texture.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ────────────────────────────────────────────────── -->
+  <section class="section cta-section" id="cta">
+    <div class="section-inner cta-inner">
+      <canvas id="cta-canvas"></canvas>
+      <div class="cta-content" data-reveal>
+        <p class="label">IO Explorer</p>
+        <h2 class="cta-headline">The Milky Way,<br />One Tab Away</h2>
+        <p class="cta-sub">
+          WebGL · Three.js · Orbital Mechanics · Texture Mapping
+        </p>
+        <a class="btn-primary" href="index.html">Launch Explorer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="footer">
+    <span class="nav-logo">IO</span>
+    <span class="footer-copy">3D Galaxy Visualization — WebGL</span>
+  </footer>
+
+  <script src="landing.js"></script>
+</body>
+</html>
