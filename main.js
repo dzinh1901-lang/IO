@@ -45,7 +45,7 @@ for (let i = 0; i < starCount * 3; i++) {
 starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.3 })));
 
-// Loading overlay
+// Loading overlay — removed automatically by createPlanetSystem once textures are loaded
 const loadingOverlay = document.createElement('div');
 loadingOverlay.id = 'loading';
 loadingOverlay.textContent = 'Loading…';

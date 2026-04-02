@@ -61,13 +61,13 @@ export class CelestialBody {
 
 export function createAsteroidBelt({ innerRadius, outerRadius, count }) {
   const belt = new THREE.Group();
-  const geo = new THREE.SphereGeometry(0.05, 4, 4);
-  const mat = new THREE.MeshStandardMaterial({ color: 0x888888 });
+  const sharedGeo = new THREE.SphereGeometry(0.05, 4, 4);
+  const sharedMat = new THREE.MeshStandardMaterial({ color: 0x888888 });
 
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2;
     const r = innerRadius + Math.random() * (outerRadius - innerRadius);
-    const asteroid = new THREE.Mesh(geo, mat);
+    const asteroid = new THREE.Mesh(sharedGeo, sharedMat);
     asteroid.position.set(
       Math.cos(angle) * r,
       (Math.random() - 0.5) * 0.8,
